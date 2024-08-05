@@ -1,10 +1,11 @@
 
 class Packet:
-    def __init__(self, srcAddress, dstAddress,seqNumber,data):
+    def __init__(self, srcAddress, dstAddress,seqNumber,data,crcRemainder):
         self.srcAddress = srcAddress
         self.dstAddress = dstAddress
         self.seqNumber = seqNumber
         self.data = data
+        self.crcRemainder = crcRemainder
     
     def displayPacket(self):
         print(f"    Source Address: {self.srcAddress}")

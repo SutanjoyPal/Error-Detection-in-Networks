@@ -1,7 +1,8 @@
 import socket
 import pickle
 from packet import Packet
-from checksum import verify_checksum
+from checksum import calculate_checksum
+from crc import mod2div,CRC_10_POLY,CRC_16_POLY,CRC_32_POLY,CRC_8_POLY
 
 server = socket.socket()
 
@@ -54,9 +55,16 @@ while True:
         print(f"Received from Sender {addr}")
         packetData.displayPacket()
         
-    codewords_string = ''.join(codewords)    
-    if verify_checksum(codewords_string):
+    codewords_string = ''.join(codewords)
+    codeword_CRC = codewords_string[:-16]+packetData.crcRemainder
+    #print(codewords_string)
+    
+    if (calculate_checksum(codewords_string[:-16]) == codewords_string[-16:]):
         print("Received data is correct as per checksum.")
     else:
-        print("Received data has some error as per checksum.")    
+        print("Received data has some error as per checksum.")
+    if(int(mod2div(codeword_CRC,CRC_10_POLY),2)==0):
+        print("Received data is correct as per CRC.")
+    else:
+        print("Received data has some error as per CRC.")             
     clientsocket.close()

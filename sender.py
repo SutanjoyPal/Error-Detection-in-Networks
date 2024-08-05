@@ -3,6 +3,7 @@ from packet import Packet
 import pickle
 from fileIO import read_input_file,prepare_datawords
 from checksum import calculate_checksum
+from crc import mod2div,CRC_10_POLY,CRC_16_POLY,CRC_32_POLY,CRC_8_POLY
 
 client=socket.socket()
 
@@ -24,11 +25,14 @@ datawords = prepare_datawords(data,16)
 datawords.append(calculate_checksum(data))
 datawords.append("-1") 
 #data = ['0010101','0101010101','1111111111','001','1010110010101','-1']
+appended_data = data + '0'*(len(CRC_10_POLY)-1)
+crc = mod2div(appended_data, CRC_10_POLY)
+
 
 seq = 0
 for packet in datawords:
     seq = seq+1
-    curPacket = Packet(client_address,server_address,seq,packet)
+    curPacket = Packet(client_address,server_address,seq,packet,crc)
     #curPacket.displayPacket()
     pickledCurPacket = pickle.dumps(curPacket)
     while True:
