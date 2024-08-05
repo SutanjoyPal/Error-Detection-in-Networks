@@ -1,6 +1,8 @@
 import socket
 from packet import Packet
 import pickle
+from fileIO import read_input_file,prepare_datawords
+from checksum import calculate_checksum
 
 client=socket.socket()
 
@@ -15,10 +17,16 @@ server_address = client.getpeername()
 client_address = client.getsockname()
 
 #STOP & WAIT to send packets
-data = ['0010101','0101010101','1111111111','001','1010110010101','-1']
+filename = input("Enter input filename: ")
+data = read_input_file(filename)
+datawords = prepare_datawords(data,16)
+#print(calculate_checksum(data))
+datawords.append(calculate_checksum(data))
+datawords.append("-1") 
+#data = ['0010101','0101010101','1111111111','001','1010110010101','-1']
 
 seq = 0
-for packet in data:
+for packet in datawords:
     seq = seq+1
     curPacket = Packet(client_address,server_address,seq,packet)
     #curPacket.displayPacket()
@@ -34,3 +42,5 @@ for packet in data:
 
 
 client.close()
+
+

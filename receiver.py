@@ -1,6 +1,7 @@
 import socket
 import pickle
 from packet import Packet
+from checksum import verify_checksum
 
 server = socket.socket()
 
@@ -17,7 +18,7 @@ while True:
     
     clientsocket.send(bytes("You are connected to receiver! Please send the packets", 'utf-8'))
         
-
+    codewords = []
     while True:
         #clientData = clientsocket #.recv(8192) #.decode('utf-8')
         #packetData = pickle.loads(clientData)
@@ -42,16 +43,20 @@ while True:
         if not buffer:
             break
 
-        
-            
+
+
         clientsocket.send(bytes('ACK', "utf-8"))
         
         if packetData.data == "-1":
             break
+        codewords.append(packetData.data)
         #print(f"Received from Sender{addr}: {clientData}")
-        print("Received from Sender{addr}")
+        print(f"Received from Sender {addr}")
         packetData.displayPacket()
         
-        
-    
+    codewords_string = ''.join(codewords)    
+    if verify_checksum(codewords_string):
+        print("Received data is correct as per checksum.")
+    else:
+        print("Received data has some error as per checksum.")    
     clientsocket.close()
